@@ -1,0 +1,140 @@
+{% extends "product/base.html" %}
+{% load static %}
+
+{% block content%}
+    <div class="row">
+            <div class="col-md-12">
+                <h3>{{ product.name }}</h3>
+            </div>
+            <div class="col-md-12">
+                <h4>{{ product.description }}</h4>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-5">
+                    <div class="col-md-1">
+                        {% if user.is_authenticated %}
+                            <a href="#"><span class="glyphicon glyphicon-heart like-click" style="color:red"></span></a>
+                        {% else %}
+                            <span class="glyphicon glyphicon-heart like-click" style="color:red"></span>
+                        {% endif %}
+                      </div>
+                    <div class="col-md-1 like-count">
+                        {{product.likes.all.count}}
+                    </div>
+                    <div class="likes-error"></div>
+                    <!--<div class="col-md-8">-->
+                        <!--{% if messages %}-->
+                            <!--<ul class="messages">-->
+                                <!--{% for message in messages %}-->
+                                    <!--<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>-->
+                                <!--{% endfor %}-->
+                            <!--</ul>-->
+                        <!--{% endif %}-->
+                    <!--</div>-->
+                </div>
+                <span class="pull-right">
+                    <h4> price: {{ product.price }}</h4>
+                </span>
+            </div>
+    </div>
+
+    <div class="col-md-12">
+        {% if user.is_authenticated %}
+            <!--comment form-->
+            <div class="col-md-6 comment-form-ajax">
+                <div class="comment-form-err"></div>
+                <textarea name="text" class="form-control comment-text"></textarea>
+                <input type="submit" value="add comment" class="btn btn-primary icon col-md-6 col-md-offset-3 submit-comment">
+            </div>
+        {% else %}
+            <div class="login-to-li-and-comment">
+                Login to like and comment!
+            </div>
+            <div class="comments-without-auth" hidden="true">
+                <!--comment form-->
+                <div class="col-md-6 comment-form-ajax">
+                    <div class="comment-form-err"></div>
+                    <textarea name="text" class="form-control comment-text"></textarea>
+                    <input type="submit" value="add comment" class="btn btn-primary icon col-md-6 col-md-offset-3 submit-comment">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <h3>comments:</h3>
+        </div>
+        <div class="col-md-8 col-md-offset-1">
+            <div class="col-md-12 comments"></div>
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="col-md-12">
+                        {{comment}}
+                    </div>
+                {%endfor%}
+            {% else %}
+                <div class="no-comments">
+                    No comments in the last 24 hours
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!--comment-->
+    <script>
+        $(document).ready(function(){
+            $('.submit-comment').click(function(){
+                $.post('{% url 'products:add_comment' %}',
+                    {
+                        'text': $('.comment-text').val(),
+                        'product': {{product.id}},
+                    },
+                    function(data){
+                        if (data.status == 'success'){
+                            $('.comment-text').val('');
+                            setTimeout(function(){
+                                $('.comments').prepend(data.text + '<br>');
+                                $('.no-comments').hide();
+                                $('.comment-form-err').text('');
+                            }, 300);
+                        }else if(data.status == 'False'){
+                            $('.comment-form-err').text('You are trying to send a blank comment! Try again!');
+                            setTimeout(function() {$('.comment-form-err').text(''); }, 3000);
+                        } else {
+                            $('.comment-form-err').text('You are blocked!');
+                            setTimeout(function() {$('.comment-form-err').text(''); }, 3000);
+                        }
+                });
+            });
+        });
+    </script>
+
+    <!--like-->
+    <script>
+        $(document).ready(function(){
+            $('.like-click').click(function(){
+                $('.like-click').animate({width: '22px'}, 200);
+                $('.like-click').animate({width: '20px'}, 0);
+                $.post('{% url 'products:add_like' %}',
+                {
+                    'product': {{product.id}},
+                },
+                function(data){
+                    if (data.status == 'True'){
+                        console.log(data.status);
+                        $('.likes-error').text('You already liked this product!');
+                        setTimeout(function() {$('.likes-error').text(''); }, 3000);
+                    }else if(data.status == 'False'){
+                        var likes = parseInt($('.like-count').text());
+                        $('.like-count').text(likes+=1);
+                    }else{
+                        $('.likes-error').text('You are blocked!');
+                        setTimeout(function() {$('.likes-error').text(''); }, 3000);
+                    };
+                });
+
+            });
+        });
+    </script>
+{% endblock content%}
