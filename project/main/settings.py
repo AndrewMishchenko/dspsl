@@ -40,8 +40,6 @@ INSTALLED_APPS = [
 
     'apps.product',
     'apps.user_profile',
-
-    'django_hosts',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -130,3 +128,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 SESSION_SAVE_EVERY_REQUEST=True
 
+# works only with test backend server
+# you must changed it
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 9000
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE

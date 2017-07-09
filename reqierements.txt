@@ -1,2 +1,5 @@
-django==1.9.4
-psycopg2
+Django==1.9.4
+psycopg2==2.7.1
+celery==4.0.2
+redis==2.10.5
+

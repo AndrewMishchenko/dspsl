@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from ..user_profile.models import Profile
+from apps.user_profile.models import Profile
 
 
 class Product(models.Model):
